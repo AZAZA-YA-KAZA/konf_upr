@@ -2,8 +2,6 @@ import os
 import zipfile
 import xml.etree.ElementTree as ET
 
-from click import command
-
 
 class VirtualShell:
 
