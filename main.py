@@ -28,7 +28,18 @@ class VirtualShell:
                     if directory not in self.filesystem:
                         self.filesystem.append(directory+"/")
 
-    def ls(self, dir):
+    def ls(self, path):
+        fil = ""
+        for i in range(len(self.filesystem)):
+            if self.filesystem[i][:self.filesystem[i].find("/")+1] == path:
+                fil = self.filesystem[i]
+        if "".join(fil) != "":
+            dir = path
+        elif path == 'ex1.zip' or path == "/":
+            dir = "/"
+        else:
+            print(f"cd: {path}: No such file or directory")
+            return
         # Список файлов в текущем каталоге
         files = []
         for i in range(len(self.filesystem)):
@@ -78,7 +89,11 @@ class VirtualShell:
             if command == "exit":
                 break
             elif command.startswith("ls"):
-                self.ls(self.current_directory[1:]+"/")
+                if len(command.split()) > 1:
+                    _, path = command.split(" ", 1)
+                else:
+                    path = self.current_directory[1:]+"/"
+                self.ls(path)
             elif command.startswith("cd"):
                 if len(command.split()) > 1:
                     _, path = command.split(" ", 1)
