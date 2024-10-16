@@ -95,5 +95,5 @@ def test_write_config(tmp_path):
         write_config(filesystem_path, output_file)
     tree = ET.parse(output_file)
     root = tree.getroot()
-    assert root.find('hostname').text == "TestHost", "Hostname должен быть записан в конфигурацию"
+    assert root.find('hostname').text == "komp", "Hostname должен быть записан в конфигурацию"
     assert root.find('filesystem').text == filesystem_path, "Путь к файловой системе должен быть записан в конфигурацию"

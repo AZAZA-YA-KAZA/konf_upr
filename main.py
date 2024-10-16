@@ -112,7 +112,7 @@ def write_config(filesystem_path, output_file):
     # Создаем корневой элемент <config>
     root = ET.Element("config")
     # Добавляем элемент
-    nam = input("Enter name of computer ")
+    nam = "komp"
     hostname_elem = ET.SubElement(root, 'hostname')
     hostname_elem.text = nam
     # Добавляем элемент <filesystem>
