@@ -71,7 +71,7 @@ def test_clear_cache(mock_makedirs, mock_rmtree, mock_listdir):
     mock_makedirs.assert_called_with('cache', exist_ok=True)  # Этот вызов должен быть вызван после удаления
 
 # Тест для метода build_graph с максимальной глубиной
-@patch('graph_builder.GraphBuilder._build_graph')
+@patch('graph_builder.GraphBuilder.build_graph')
 def test_build_graph_max_depth(mock_build_graph):
     # Эмулируем успешный вызов рекурсивного метода build_graph
     graph_code = '@startuml\n\n\nartifact_1: 1.0\n\n@enduml'
@@ -103,6 +103,6 @@ def test_build_graph_logic(mock_load_xml):
     mock_load_xml.return_value = mock_pom
     mock_pom.findall.return_value = []
     # Проверяем, что строится правильный граф
-    result = builder._build_graph(package, current_depth=0, max_depth=3)
+    result = builder.buildgraph(package, current_depth=0, max_depth=3)
     assert 'artifact' in result
     assert '1.0' in result
