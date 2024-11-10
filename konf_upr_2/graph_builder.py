@@ -22,16 +22,6 @@ class GraphBuilder:
             pass
         os.makedirs('cache', exist_ok=True)
 
-    def build_url(self, package: dict[str, str]):
-        try:
-            url = (f"https://repo1.maven.org/maven2/"
-                   f"{'/'.join(package['group'].split('.'))}/"
-                   f"{package['artifact']}/{package['version']}/"
-                   f"{package['artifact']}-{package['version']}.pom")
-        except KeyError:
-            print('Неправильный словарь с параметрами пакета')
-            return ''
-        return url
 
     def load_xml(self, package: dict[str, str]):
         f_name = f"{package['artifact']}_{package['version']}.xml"
@@ -40,7 +30,10 @@ class GraphBuilder:
             makedirs('cache')
 
         if f_name not in listdir('cache'):
-            url = self.build_url(package)
+            url = (f"https://repo1.maven.org/maven2/"
+                   f"{'/'.join(package['group'].split('.'))}/"
+                   f"{package['artifact']}/{package['version']}/"
+                   f"{package['artifact']}-{package['version']}.pom")
             package_pom = get(url)
             if package_pom.status_code == 200:
                 with open(f'cache/{f_name}', 'wt') as file:
