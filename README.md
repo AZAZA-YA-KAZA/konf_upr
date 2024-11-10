@@ -79,11 +79,3 @@ pytest -v
 ![image](https://github.com/user-attachments/assets/26ad7e87-1610-4f49-8b61-c40f94c67532)
 ### 2. python main.py conf.xml 3
 ![image](https://github.com/user-attachments/assets/af9e60fa-0a57-4136-932f-bc22c4cffa80)
-### 3. exit - Выход из эмулятора
-![image](https://github.com/user-attachments/assets/c1c2d849-366e-4b62-8303-7a2e7744f071)
-### 4. clear - Очистка консоли
-![image](https://github.com/user-attachments/assets/3909f8d2-92b9-46a7-8e6c-fc40704312e9)
-### 5. du - Объем файлов в каталоге
-![image](https://github.com/user-attachments/assets/2129d2dc-e7a7-462e-baec-eb126438f592)
-## Общие тесты через pytest
-![image](https://github.com/user-attachments/assets/01d2809d-ae88-4632-a7ac-649553d11846)
