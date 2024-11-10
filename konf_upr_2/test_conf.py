@@ -45,7 +45,7 @@ def test_main_success(mock_draw_graph, mock_build_graph):
     mock_draw_graph.return_value = None  # Эмулируем успешную отрисовку
 
     with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
-        main(['script.py', 'config.xml', '3'])
+        main(['script.py', 'pom.xml', '3'])
 
     mock_build_graph.assert_called_once()  # Проверяем, что метод build_graph был вызван
     mock_draw_graph.assert_called_once()  # Проверяем, что метод draw_graph был вызван
