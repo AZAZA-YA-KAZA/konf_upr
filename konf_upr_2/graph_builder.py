@@ -47,12 +47,12 @@ class GraphBuilder:
 
     # Публичный метод для построения графа
     def build_graph(self, code: str, package: dict[str, str], max_depth: int = None):
-        graph_code = '@startuml\n\n\n' + self._build_graph(package, 0, int(max_depth)) + '\n\n@enduml'
+        graph_code = '@startuml\n\n\n' + self.buildgraph(package, 0, int(max_depth)) + '\n\n@enduml'
         with open(code, 'wt') as file:
             file.write(graph_code)
         self.lines = set()
 
-    def _build_graph(self, package: dict[str, str], current_depth: int = 0, max_depth: int = None):
+    def buildgraph(self, package: dict[str, str], current_depth: int = 0, max_depth: int = None):
         if max_depth is not None and current_depth >= max_depth:
             return ''  # Прерываем рекурсию, если достигли максимальной глубины
 
@@ -96,7 +96,7 @@ class GraphBuilder:
                 graph_code += line
                 self.lines.add(line)
             # Рекурсивный вызов с увеличением текущей глубины
-            result = self._build_graph(pkg, current_depth + 1, max_depth)
+            result = self.buildgraph(pkg, current_depth + 1, max_depth)
             if result:  # Если результат не None, добавляем его
                 graph_code += result
 
