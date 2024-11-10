@@ -11,7 +11,7 @@ class VirtualShell:
         # Распаковка виртуальной файловой системы в память
         self.filesystem = []
         self.current_directory = "/"
-        self.load_filesystem("ex1.zip")
+        self.load_filesystem("konf_upr_1/ex1.zip")
 
     def read_config(self, config_file):
         tree = ET.parse(config_file)
@@ -124,9 +124,9 @@ def write_config(filesystem_path, output_file):
         tree.write(file, encoding='utf-8', xml_declaration=True)
 
 def sam():
-    script_path = os.path.abspath('ex1.zip')
-    write_config(script_path, "config.xml")
-    shell = VirtualShell('config.xml')
+    script_path = os.path.abspath('konf_upr_1/ex1.zip')
+    write_config(script_path, "konf_upr_1/config.xml")
+    shell = VirtualShell('konf_upr_1/config.xml')
     shell.run()
 
 
