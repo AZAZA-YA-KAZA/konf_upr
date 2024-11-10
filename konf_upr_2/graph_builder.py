@@ -45,18 +45,6 @@ class GraphBuilder:
 
         return et.parse(f'cache/{f_name}').getroot()
 
-    def build_graph(self, code: str, package: dict[str, str]):
-        graph_code = ('@startuml\n\n\n' +
-                      self._build_graph(package) +
-                      '\n\n@enduml')
-
-        with open(code, 'wt') as file:
-            file.write(graph_code)
-
-        self.lines = set()
-
-
-
     # Публичный метод для построения графа
     def build_graph(self, code: str, package: dict[str, str], max_depth: int = None):
         graph_code = '@startuml\n\n\n' + self._build_graph(package, 0, int(max_depth)) + '\n\n@enduml'
