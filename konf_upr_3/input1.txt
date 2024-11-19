@@ -1,0 +1,25 @@
+app:
+  name: "MyApplication"
+  version: "1.0.0"
+  description: "Это пример приложения на YAML."
+  constants:
+    pi: 3.14159
+    e: 2.71828
+    radius: 5
+  settings:
+    debug: true
+    log_level: "info"
+    database:
+      host: "localhost"
+      port: 5432
+      username: "user"
+      password: "password"
+      database_name: "my_database"
+  features:
+    - "Функция 1"
+    - 544
+    - "Функция 2"
+  name: "MyApplication"
+
+
+  #The end of program
