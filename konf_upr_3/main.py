@@ -14,28 +14,31 @@ def down_inf(file):
                     continue  # Пропускаем пустые строки и комментарии
                 # Преобразование однострочных комментариев в структуру с %
                 if line.lstrip().startswith('#'):
-                    comment = line.lstrip()[1:].strip()
+                    comment = line.replace('#', '%', 1)
                     if comment:
                         if section not in toml_data:
                             toml_data[section] = []
-                        toml_data[section].append(f'%{comment}')
+                        toml_data[section].append(comment)
                     continue
 
                 # Разделение секции (если строка начинается с имени секции)
                 if line[0] != " " and line[0] != "-":
-                    section = line.strip()[:-1]
+                    if len(toml_data) > 0:
+                        toml_data[section].append("}")
+                    section = line[:-1]
                     if section not in toml_data:
                         toml_data[section] = []
-                    toml_data[section].append(f"{section} ->")  # Секцию записываем как "section ->"
+                    toml_data[section].append(f"{section} -> {{")  # Секцию записываем как "section ->"
                     continue
 
-                line = line.lstrip()
                 # Если строка начинается с "-", это элемент массива
-                if line.startswith("-"):
-                    value = line[1:].strip()  # Убираем дефис и пробел
-                    toml_data[section].append("  "+value)
+                if line.lstrip().startswith("-"):
+                    if current_array is None:
+                        toml_data[section][-1] = toml_data[section][-1][:-1]+"<<"
+                        current_array = value
+                    value = line.replace('- ', '', 1) # Убираем дефис
+                    toml_data[section].append(value)
                     continue
-
                 # Если массив завершился, добавляем закрывающий символ ">>"
                 if current_array is not None:
                     toml_data[section].append(">>")
@@ -44,8 +47,6 @@ def down_inf(file):
                 # Разделение ключа и значения (для словаря и констант)
                 if ':' in line:
                     key, value = line.split(':', 1)
-                    key = key.strip()
-                    value = value.strip()
 
                     # Если значение пустое, это начало словаря
                     if value == "":
@@ -58,53 +59,46 @@ def down_inf(file):
                     # Если нет ":" - это ошибка или ошибка в формате
                     raise SyntaxError(f"Ошибка синтаксиса на строке {line_number}: '{line}'")
 
-            # Закрытие открытых словарей
-            if current_array is not None:
-                toml_data[section].append(">>")
-                current_array = None
-
     except Exception as e:
         print(f"Ошибка при обработке файла: {e}")
 
+    # Если массив завершился, добавляем закрывающий символ ">>"
+    if current_array is not None:
+        toml_data[section].append(">>")
+    toml_data[section].append("}")
+
     return toml_data
 
-def generate_custom_config(toml_data):
-    lines = []
-
-    def process_value(value):
-        if isinstance(value, str):
-            # Проверка, является ли строка числом
-            try:
-                if '.' in value:
-                    return float(value)  # Если есть точка, преобразуем в float
+def write_obr(file):
+    list = []
+    t = ""
+    for key in file:
+        f = False
+        ff = False
+        for i in file[key]:
+            if '>>' in i:
+                f = False
+                ff = False
+                t += i
+                list.append(t)
+                t = ""
+                continue
+            if f:
+                if not ff:
+                    t += i.strip()
+                    ff = True
                 else:
-                    return int(value)  # Иначе преобразуем в int
-            except ValueError:
-                # Если не число, проверяем, содержит ли строка буквы
-                if any(char.isalpha() for char in value):  # Проверка на наличие букв
-                    return f'[[{value}]]'  # Оборачиваем в [[ ]]
-                return f'"{value}"'  # Если не буквы, возвращаем как строку
-        elif isinstance(value, list):
-            # Обработка списка, чтобы каждый элемент был в отдельных двойных квадратных скобках
-            return ', '.join([f'[[{item}]]' for item in value])
-        else:
-            return str(value)
-
-    for key, value in toml_data.items():
-        if isinstance(value, dict):
-            lines.append(f"{key} = {{")
-            for sub_key, sub_value in value.items():
-                if isinstance(sub_value, list):
-                    # Если sub_value - это список, то обрабатываем его отдельно
-                    formatted_value = ', '.join([f'[[{item}]]' for item in sub_value])
-                    lines.append(f"    {sub_key} = list({formatted_value});")
-                else:
-                    lines.append(f"    {sub_key} = {process_value(sub_value)};")
-            lines.append("}")
-        else:
-            lines.append(f"var {key} = {process_value(value)};")
-
-    return "\n".join(lines).replace('"', '')
+                    t+= ', ' + i.strip()
+                continue
+            else:
+                t = i
+            if '-> <<' in i:
+                f = True
+                continue
+            list.append(t)
+    for i in list:
+        print(i)
+    return list
 
 
 def main(args):
@@ -117,15 +111,11 @@ def main(args):
     info = down_inf(input_path)
     if info is None:
         return  # Если есть синтаксическая ошибка, выходим
-    for key in info:
-        for i in info[key]:
-            print(i)
+    info = write_obr(info)
     try:
         with open(output_path, 'w') as f:
-            for key in info:
-                for i in info[key]:
-                    print(i)
-                    f.write(i+'\n')
+            for i in info:
+                f.write(i+'\n')
     except Exception as e:
         print(f"Ошибка при записи в файл '{output_path}': {e}")
 
