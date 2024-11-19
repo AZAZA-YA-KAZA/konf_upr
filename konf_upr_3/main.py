@@ -96,9 +96,6 @@ def write_obr(file):
                 f = True
                 continue
             list.append(t)
-    for i in list:
-        print(i)
-    print(list)
     return list
 
 

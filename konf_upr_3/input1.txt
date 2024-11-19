@@ -21,12 +21,10 @@ app:
   name: "MyApplication"
 
   #The end of program
-
 server:
   # host: "localhost"
   port: 8080
   timeout: 30
-
 database:
   user: "admin"
   password: "secret"
