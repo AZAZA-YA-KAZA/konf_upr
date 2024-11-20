@@ -18,7 +18,6 @@ app:
     - "Func 1"
     - 544
     - "Func 2"
-  name: "MyApplication"
 
   #The end of program
 server:

@@ -14,12 +14,9 @@ app -> {
       username ->  "user"
       password ->  "password"
       database_name ->  "my_database"
-  features -> <<"Func 1", 544, "Func 2">>
-  name ->  "MyApplication"
-  %The end of program
-}
 server -> {
   % host: "localhost"
+  % host: "localhost">>
   port ->  8080
   timeout ->  30
 }

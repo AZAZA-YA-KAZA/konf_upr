@@ -62,7 +62,7 @@ cd konf_upr_3
 ```
 # Запуск программы
 ```shell
-python main.py input1.txt output1.txt
+python main.py input1.yaml output1.txt
 ```
 # Тестирование
 ```shell
