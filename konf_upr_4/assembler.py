@@ -36,7 +36,7 @@ def assembler(arg):
     output_file = arg[2]
     log_file = arg[3]
     with (open(input_file, "r") as infile,
-          open(output_file, "w", newline="") as outfile,
+          open(output_file, "wb") as outfile,
           open(log_file, "w", newline="") as logfile):
         log_writer = csv.writer(logfile)
         for line in infile:
