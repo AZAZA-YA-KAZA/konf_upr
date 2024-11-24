@@ -34,7 +34,7 @@ def assemble_command(instruction, operands):
     #инвертирование порядка байтов
     elif instruction == "BSWAP":
         b, c = operands
-        if b < 3:
+        if b < 4:
             word = (opcode << 9) | (b << 5) | (c << 1)
         else:
             word = c
@@ -75,7 +75,7 @@ def test_bswap():
     # Создаем команды для BSWAP для каждого элемента вектора
     commands = []
     for i in range(len(vector)):
-        commands.append(f"BSWAP {i+3} {vector[i]}")
+        commands.append(f"BSWAP {i+4} {vector[i]}")
     # Записываем команды в файл для ассемблера
     with open("commands.txt", "w") as f:
         for command in commands:
