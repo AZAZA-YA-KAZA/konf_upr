@@ -1,6 +1,4 @@
-import py
 import pytest
-import os
 
 # Импортируем функции из вашего модуля
 from main import down_inf, write_obr
