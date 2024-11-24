@@ -1,53 +1,64 @@
-import struct
-import sys
 import csv
+import struct
+from sys import argv
 
-# Память и регистры
-REGISTERS = [0] * 32
-MEMORY = [0] * 1024
+# Таблица операций
+INSTRUCTIONS = {
+    99: "LOAD_CONST",  # Загрузка константы
+    96: "LOAD_MEM",  # Чтение значения из памяти
+    1: "STORE_MEM",  # Запись значения в память
+    82: "BSWAP",  # Унарная операция: BSWAP
+}
 
 
-# Интерпретация команды
-def execute_command(binary):
-    opcode = (binary >> 24) & 0xFF
+# Функция для выполнения команды
+def execute_command(command, memory):
+    opcode = command >> 25  # Опкод занимает первые 7 бит
+    b = (command >> 21) & 0xF  # Адрес регистра для результата
+    c = command & 0xFFF  # Константа или адрес
+    print(bin(c))
     if opcode == 99:  # LOAD_CONST
-        b = (binary >> 20) & 0xF
-        c = binary & 0xFFFFF
-        REGISTERS[b] = c
+        memory[b] = c
+        return f"LOAD_CONST: R[{b}] = {c}"
+
     elif opcode == 96:  # LOAD_MEM
-        b = (binary >> 20) & 0xF
-        c = binary & 0xFFFFF
-        REGISTERS[b] = MEMORY[c]
+        memory[b] = memory.get(c, 0)  # Чтение из памяти по адресу C
+        return f"LOAD_MEM: R[{b}] = MEM[{c}] = {memory[b]}"
+
     elif opcode == 1:  # STORE_MEM
-        b = (binary >> 6) & 0x3FFFF
-        c = binary & 0x3F
-        MEMORY[b] = REGISTERS[c]
+        memory[c] = memory.get(b, 0)  # Запись в память по адресу C
+        return f"STORE_MEM: MEM[{c}] = R[{b}] = {memory[c]}"
+
     elif opcode == 82:  # BSWAP
-        b = (binary >> 5) & 0xF
-        c = binary & 0xF
-        REGISTERS[c] = int.from_bytes(REGISTERS[b].to_bytes(4, "little"), "big")
+        memory[b] = int(format(memory[b], '08x')[::-1], 16)  # Инвертирование байтов
+        return f"BSWAP: R[{b}] = {memory[b]}"
+
     else:
-        raise ValueError(f"Unknown opcode: {opcode}")
+        return f"Unknown opcode: {opcode}"
 
 
 # Интерпретатор
-def interpreter(binary_file, result_file, memory_range):
-    with open(binary_file, "rb") as bfile:
-        while chunk := bfile.read(4):
-            binary = int.from_bytes(chunk, "little")
-            execute_command(binary)
+def interpreter(input_file, memory_range, output_file):
+    memory = {i: 0 for i in range(memory_range[0], memory_range[1] + 1)}  # Инициализация памяти
 
-    start, end = map(int, memory_range.split(":"))
-    with open(result_file, "w", newline="") as rfile:
-        writer = csv.writer(rfile)
-        writer.writerow(["Address", "Value"])
-        for i in range(start, end + 1):
-            writer.writerow([i, MEMORY[i]])
+    with open(input_file, "rb") as infile, open(output_file, "w", newline="") as csvfile:
+        log_writer = csv.writer(csvfile)
+        log_writer.writerow(["Command", "Memory State"])
+        while True:
+            byte = infile.read(4)  # Чтение 4 байт за раз
+            if len(byte) < 4:
+                break  # Если прочитано меньше 4 байт, выходим из цикла
+            command = struct.unpack(">I", byte)[0]  # Преобразование в целое число (big-endian)
+            result = execute_command(command, memory)
+            log_writer.writerow([result, memory.copy()])  # Запись состояния памяти после выполнения команды
 
 
 # Вызов интерпретатора
 if __name__ == "__main__":
-    binary_path = sys.argv[1]
-    result_path = sys.argv[2]
-    memory_range = sys.argv[3]
-    interpreter(binary_path, result_path, memory_range)
+    if len(argv) < 4:
+        print("Недостаточно аргументов. Укажите входной файл, диапазон памяти и выходной файл.")
+    else:
+        input_file = argv[1]
+        memory_range = list(map(int, argv[3].split("-")))
+        output_file = argv[2]
+        interpreter(input_file, memory_range, output_file)
