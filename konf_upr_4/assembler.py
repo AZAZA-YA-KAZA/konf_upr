@@ -19,7 +19,6 @@ def assemble_command(instruction, operands):
     if instruction == "LOAD_CONST":
         b, c = operands
         word = (opcode << 25) | (b << 21) | (c) #(30-7 и тд)
-        print(bin(word))
         binary_data.extend(reversed(word.to_bytes(4, byteorder='little')))
         log_data.append([instruction, opcode, b, c, f"0x{hex(word)}"])
     elif instruction == "LOAD_MEM":
@@ -30,12 +29,15 @@ def assemble_command(instruction, operands):
     elif instruction == "STORE_MEM":
         b, c = operands
         word = (opcode << 25) | (b << 5) | c
-        binary_data.extend(word.to_bytes(4, byteorder='little'))
+        binary_data.extend(reversed(word.to_bytes(4, byteorder='little')))
         log_data.append([instruction, opcode, b, f"{c}=0x{binary_data[-6:].hex()}"])
     #инвертирование порядка байтов
     elif instruction == "BSWAP":
         b, c = operands
-        word = (opcode << 9) | (b << 5) | (c << 1)
+        if b < 3:
+            word = (opcode << 9) | (b << 5) | (c << 1)
+        else:
+            word = c
         binary_data.extend(word.to_bytes(2, byteorder='little'))
         log_data.append([instruction, opcode, b, c, f"0x{binary_data[-6:].hex()}"])
     else:
@@ -66,6 +68,23 @@ def assembler(arg):
             log_writer.writerows(log) #Запись лога
 
 
+# Тестовая программа для выполнения BSWAP над вектором длины 4
+def test_bswap():
+    vector = [11810, 14102, 31103, 9718]  # Исходный вектор
+    print("Исходный вектор:", [hex(x) for x in vector])
+    # Создаем команды для BSWAP для каждого элемента вектора
+    commands = []
+    for i in range(len(vector)):
+        commands.append(f"BSWAP {i+3} {vector[i]}")
+    # Записываем команды в файл для ассемблера
+    with open("commands.txt", "w") as f:
+        for command in commands:
+            f.write(command + "\n")
+
+    # Запускаем ассемблер
+    assembler(["assembler.py", "commands.txt", "output_comm.bin", "log_com.csv"])
+
 # Вызов ассемблера
 if __name__ == "__main__":
     assembler(argv)
+    test_bswap()
